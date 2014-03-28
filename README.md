@@ -1,4 +1,4 @@
-#AndroidFaceCropper
+AndroidFaceCropper
 ==================
 
 Android bitmap Face Cropper
@@ -6,9 +6,7 @@ Android bitmap Face Cropper
 [Link to sample apk and jar](https://github.com/lafosca/AndroidFaceCropper/releases/tag/1.0)
 
 
-##Usage
-==================
- 
+##Usage 
 To crop faces automatically, you have to instantiate an object of `FaceCropper` class in that way:
 
 	FaceCropper mFaceCropper = new FaceCropper();
@@ -16,6 +14,7 @@ To crop faces automatically, you have to instantiate an object of `FaceCropper` 
     
 `cropFace` method supports `int` argument as a drawable resource, or directly a `Bitmap`.
 
+##Configuration
 There are 4 important methods to configure its behavior:
 
 `setMaxFaces(int faces)`, to adjust the maximum number of faces to be recognized.
