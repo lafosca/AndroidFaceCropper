@@ -87,14 +87,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     class ImageAdapter extends PagerAdapter {
-//        private String[] urls = new String[] {
-//                "https://lh6.googleusercontent.com/-T2Rh2NlkyAs/Ut0sXoTUQ-I/AAAAAAAAC-s/IiSrdL8uQTE/w1227-h920-no/IMG_20140120_150153.jpg",
-//                "https://lh6.googleusercontent.com/-9MR9Bor8CS4/UukoxJqpBpI/AAAAAAAADA0/mBpxKgcMBY4/w690-h920-no/IMG_20140129_171350.jpg",
-//                "http://lh4.ggpht.com/-9mrs8_wnkng/TyWXc74v_EI/AAAAAAAABqA/aMXk-ytB7t8/Mart%2525C3%2525AD%252520Marc%2525C3%2525B3.jpg?imgmax=640",
-//                "http://www.nonada.es/wp-content/uploads/guillem-agullo-txt2.jpg",
-//                "http://old.kaosenlared.net/img2/134/134641_flix_goi.jpg",
-//                "http://1.bp.blogspot.com/-PeUq8jz5xEE/TutMy-d3liI/AAAAAAAAAKM/7lYfDeDxmj8/s1600/4303290026_6944019949_o.jpg"
-//        };
 
         private int[] urls = new int[] {
                 R.drawable.lluis1,
