@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cat.lafosca.facecropper.util;
+package cat.lafosca.facecropper;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,8 +22,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.media.FaceDetector;
 import android.util.Log;
-
-import cat.lafosca.facecropper.BuildConfig;
 
 /**
  * An utility that crops faces from bitmaps.

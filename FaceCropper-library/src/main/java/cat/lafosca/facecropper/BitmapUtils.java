@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cat.lafosca.facecropper.util;
+package cat.lafosca.facecropper;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

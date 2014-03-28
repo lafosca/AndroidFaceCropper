@@ -1,4 +1,4 @@
-package cat.lafosca.facecropper.ui;
+package cat.lafosca.facecropper.sample;
 
 import android.graphics.Bitmap;
 import android.support.v4.view.PagerAdapter;
@@ -14,9 +14,7 @@ import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
-import cat.lafosca.facecropper.R;
-import cat.lafosca.facecropper.util.FaceCropper;
-
+import cat.lafosca.facecropper.FaceCropper;
 
 public class MainActivity extends ActionBarActivity {
 
