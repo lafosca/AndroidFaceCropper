@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 
-import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -21,7 +20,7 @@ public class MainActivity extends ActionBarActivity {
     private Picasso mPicasso;
     private FaceCropper mFaceCropper;
     private ViewPager mViewPager;
-    private LruCache mCache;
+
     private Transformation mCropTransformation = new Transformation() {
 
         @Override
@@ -31,7 +30,20 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public String key() {
-            return "crop()";
+            StringBuilder builder = new StringBuilder(48);
+
+            builder.append("faceCrop(");
+            builder.append("minSize=").append(mFaceCropper.getFaceMinSize());
+            builder.append(",maxFaces=").append(mFaceCropper.getMaxFaces());
+
+            FaceCropper.SizeMode mode = mFaceCropper.getSizeMode();
+            if (FaceCropper.SizeMode.EyeDistanceFactorMargin.equals(mode)) {
+                builder.append(",distFactor=").append(mFaceCropper.getEyeDistanceFactorMargin());
+            } else if (FaceCropper.SizeMode.FaceMarginPx.equals(mode)) {
+                builder.append(",margin=").append(mFaceCropper.getFaceMarginPx());
+            }
+
+            return builder.append(")").toString();
         }
     };
 
@@ -42,8 +54,7 @@ public class MainActivity extends ActionBarActivity {
 
         mFaceCropper = new FaceCropper(1f);
         mFaceCropper.setFaceMinSize(0);
-        mCache = new LruCache(this);
-        mPicasso = new Picasso.Builder(this).memoryCache(mCache).build();
+        mPicasso = Picasso.with(this);
 
         final ImageAdapter adapter = new ImageAdapter();
         mViewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -68,7 +79,6 @@ public class MainActivity extends ActionBarActivity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                mCache.clear();
                 mFaceCropper.setEyeDistanceFactorMargin((float) i / 10);
                 adapter.updateView(mViewPager.getCurrentItem());
             }
@@ -126,7 +136,11 @@ public class MainActivity extends ActionBarActivity {
             ImageView imageCropped = (ImageView) v.findViewById(R.id.imageViewCropped);
 
             mPicasso.load(urls[position]).into(image);
-            mPicasso.load(urls[position]).transform(mCropTransformation).into(imageCropped);
+
+            mPicasso.load(urls[position])
+                    .config(Bitmap.Config.RGB_565)
+                    .transform(mCropTransformation)
+                    .into(imageCropped);
         }
 
         public void updateView(int position) {

@@ -77,6 +77,10 @@ public class FaceCropper {
         mSizeMode = SizeMode.FaceMarginPx;
     }
 
+    public SizeMode getSizeMode() {
+        return mSizeMode;
+    }
+
     public float getEyeDistanceFactorMargin() {
         return mEyeDistanceFactorMargin;
     }
