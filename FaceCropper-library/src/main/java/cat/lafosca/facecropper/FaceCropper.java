@@ -100,9 +100,9 @@ public class FaceCropper {
 
         FaceDetector faceDetector = new FaceDetector(
                 fixedBitmap.getWidth(), fixedBitmap.getHeight(),
-                MAX_FACES);
+                mMaxFaces);
 
-        FaceDetector.Face[] faces = new FaceDetector.Face[MAX_FACES];
+        FaceDetector.Face[] faces = new FaceDetector.Face[mMaxFaces];
 
         // The bitmap must be in 565 format (for now).
         int faceCount = faceDetector.findFaces(fixedBitmap, faces);
