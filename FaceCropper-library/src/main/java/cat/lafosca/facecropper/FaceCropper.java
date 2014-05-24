@@ -120,6 +120,8 @@ public class FaceCropper {
         int endX = 0;
         int endY = 0;
 
+        PointF centerFace = new PointF();
+
         // Calculates minimum box to fit all detected faces
         for (int i = 0; i < faceCount; i++) {
             FaceDetector.Face face = faces[i];
@@ -135,7 +137,6 @@ public class FaceCropper {
 
             faceSize = Math.max(faceSize, mFaceMinSize);
 
-            PointF centerFace = new PointF();
             face.getMidPoint(centerFace);
 
             int tInitX = (int) (centerFace.x - faceSize / 2);
