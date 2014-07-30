@@ -19,6 +19,9 @@ package cat.lafosca.facecropper;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.media.FaceDetector;
 import android.util.Log;
@@ -41,6 +44,8 @@ public class FaceCropper {
     private float mEyeDistanceFactorMargin = 2f;
     private int mMaxFaces = MAX_FACES;
     private SizeMode mSizeMode = SizeMode.EyeDistanceFactorMargin;
+    private boolean mDebug;
+    private Paint mDebugPainter;
 
     public FaceCropper() { }
 
@@ -88,6 +93,16 @@ public class FaceCropper {
     public void setEyeDistanceFactorMargin(float eyeDistanceFactorMargin) {
         mEyeDistanceFactorMargin = eyeDistanceFactorMargin;
         mSizeMode = SizeMode.EyeDistanceFactorMargin;
+    }
+
+    public boolean isDebug() {
+        return mDebug;
+    }
+
+    public void setDebug(boolean debug) {
+        mDebug = debug;
+        mDebugPainter = new Paint();
+        mDebugPainter.setColor(Color.RED);
     }
 
     public Bitmap cropFace(Context ctx, int resDrawable) {

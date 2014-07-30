@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/pre-dexed/debug/classes-60e9dab757050ebdf30b244154b7f8fc5bccdb26.jar"
+        jar="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/exploded-aar/AndroidFaceCropper/FaceCropper-library/unspecified/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="88c5bbd62df6142779fe8bba76f1853c3f2d7b8e"/>
+    <item
+        dex="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/pre-dexed/debug/support-annotations-20.0.0-fd6e5beae6d0df0d7b702742b6ff687efb8568c7.jar"
+        jar="/Users/Ignasi/Development/android-sdk/extras/android/m2repository/com/android/support/support-annotations/20.0.0/support-annotations-20.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="9d9013e9ff35fc3756411e62873c363c70c638fa"/>
+    <item
+        dex="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/pre-dexed/debug/picasso-2.2.0-56b6a21992dc526e01280e5afc5ebf0a1fed8c91.jar"
+        jar="/Users/Ignasi/.gradle/caches/modules-2/files-2.1/com.squareup.picasso/picasso/2.2.0/74137f8d9aac26dd9463efe32271f2be8d41cda9/picasso-2.2.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="74137f8d9aac26dd9463efe32271f2be8d41cda9"/>
+    <item
+        dex="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/pre-dexed/debug/classes-76082729e3b2ab8c2defec504e51f32cc54898e8.jar"
+        jar="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/exploded-aar/com.android.support/appcompat-v7/20.0.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="f21927d22fe31889ecce94dd697a2e75b137e0ef"/>
+    <item
+        dex="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/pre-dexed/debug/internal_impl-20.0.0-7086cad9ffa29cb802241487e8ad46446b09ed8e.jar"
+        jar="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/libs/internal_impl-20.0.0.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="e40b3078e3fbd353c9f44da8df25a8fc0078209d"/>
+    <item
+        dex="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/pre-dexed/debug/classes-e713bf584acd3d6d51e3e0543f7dff43ba5a0829.jar"
+        jar="/Users/Ignasi/Development/lafosca/AndroidFaceCropper/FaceCropper-sample/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/classes.jar"
+        jumboMode="false"
+        revision="20.0.0"
+        sha1="8694693636ab36910c8100ce527c258ff3ebece0"/>
+
+</pre-dex-items>
