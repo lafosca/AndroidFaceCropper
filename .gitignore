@@ -35,3 +35,4 @@ local.properties
 
 # Signing
 signing/
+build/

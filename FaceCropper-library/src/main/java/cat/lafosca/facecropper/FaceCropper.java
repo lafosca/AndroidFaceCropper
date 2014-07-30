@@ -21,8 +21,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.media.FaceDetector;
 import android.util.Log;
 
@@ -46,15 +49,30 @@ public class FaceCropper {
     private SizeMode mSizeMode = SizeMode.EyeDistanceFactorMargin;
     private boolean mDebug;
     private Paint mDebugPainter;
+    private Paint mDebugAreaPainter;
 
-    public FaceCropper() { }
+    public FaceCropper() {
+        initPaints();
+    }
 
     public FaceCropper(int faceMarginPx) {
         setFaceMarginPx(faceMarginPx);
+        initPaints();
     }
 
     public FaceCropper(float eyesDistanceFactorMargin) {
         setEyeDistanceFactorMargin(eyesDistanceFactorMargin);
+        initPaints();
+    }
+
+    private void initPaints() {
+        mDebugPainter = new Paint();
+        mDebugPainter.setColor(Color.RED);
+        mDebugPainter.setAlpha(80);
+
+        mDebugAreaPainter = new Paint();
+        mDebugAreaPainter.setColor(Color.GREEN);
+        mDebugAreaPainter.setAlpha(80);
     }
 
     public int getMaxFaces() {
@@ -101,45 +119,43 @@ public class FaceCropper {
 
     public void setDebug(boolean debug) {
         mDebug = debug;
-        mDebugPainter = new Paint();
-        mDebugPainter.setColor(Color.RED);
     }
 
-    public Bitmap cropFace(Context ctx, int resDrawable) {
-        // Set internal configuration to RGB_565
-        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-        bitmapOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-
-        return cropFace(BitmapFactory.decodeResource(ctx.getResources(), resDrawable, bitmapOptions));
-    }
-
-    public Bitmap cropFace(Bitmap original) {
+    protected CropResult cropFace(Bitmap original, boolean debug) {
         Bitmap fixedBitmap = BitmapUtils.forceEvenBitmapSize(original);
         fixedBitmap = BitmapUtils.forceConfig565(fixedBitmap);
+        Bitmap mutableBitmap = fixedBitmap.copy(Bitmap.Config.RGB_565, true);
+
+        if (fixedBitmap != mutableBitmap) {
+            fixedBitmap.recycle();
+        }
 
         FaceDetector faceDetector = new FaceDetector(
-                fixedBitmap.getWidth(), fixedBitmap.getHeight(),
+                mutableBitmap.getWidth(), mutableBitmap.getHeight(),
                 mMaxFaces);
 
         FaceDetector.Face[] faces = new FaceDetector.Face[mMaxFaces];
 
         // The bitmap must be in 565 format (for now).
-        int faceCount = faceDetector.findFaces(fixedBitmap, faces);
+        int faceCount = faceDetector.findFaces(mutableBitmap, faces);
 
         if (BuildConfig.DEBUG) {
             Log.d(LOG_TAG, faceCount + " faces found");
         }
 
         if (faceCount == 0) {
-            return fixedBitmap;
+            return new CropResult(mutableBitmap);
         }
 
-        int initX = fixedBitmap.getWidth();
-        int initY = fixedBitmap.getHeight();
+        int initX = mutableBitmap.getWidth();
+        int initY = mutableBitmap.getHeight();
         int endX = 0;
         int endY = 0;
 
         PointF centerFace = new PointF();
+
+        Canvas canvas = new Canvas(mutableBitmap);
+        canvas.drawBitmap(mutableBitmap, new Matrix(), null);
 
         // Calculates minimum box to fit all detected faces
         for (int i = 0; i < faceCount; i++) {
@@ -147,6 +163,7 @@ public class FaceCropper {
 
             // Eyes distance * 3 usually fits an entire face
             int faceSize = (int) (face.eyesDistance() * 3);
+
             if (SizeMode.FaceMarginPx.equals(mSizeMode)) {
                 faceSize += mFaceMarginPx * 2; // *2 for top and down/right and left effect
             }
@@ -158,6 +175,11 @@ public class FaceCropper {
 
             face.getMidPoint(centerFace);
 
+            if (debug) {
+                canvas.drawPoint(centerFace.x, centerFace.y, mDebugPainter);
+                canvas.drawCircle(centerFace.x, centerFace.y, face.eyesDistance() * 1.5f, mDebugPainter);
+            }
+
             int tInitX = (int) (centerFace.x - faceSize / 2);
             int tInitY = (int) (centerFace.y - faceSize / 2);
             tInitX = Math.max(0, tInitX);
@@ -165,8 +187,8 @@ public class FaceCropper {
 
             int tEndX = tInitX + faceSize;
             int tEndY = tInitY + faceSize;
-            tEndX = Math.min(tEndX, fixedBitmap.getWidth());
-            tEndY = Math.min(tEndY, fixedBitmap.getHeight());
+            tEndX = Math.min(tEndX, mutableBitmap.getWidth());
+            tEndY = Math.min(tEndY, mutableBitmap.getHeight());
 
             initX = Math.min(initX, tInitX);
             initY = Math.min(initY, tInitY);
@@ -177,18 +199,101 @@ public class FaceCropper {
         int sizeX = endX - initX;
         int sizeY = endY - initY;
 
-        if (sizeX + initX > fixedBitmap.getWidth()) {
-            sizeX = fixedBitmap.getWidth() - initX;
+        if (sizeX + initX > mutableBitmap.getWidth()) {
+            sizeX = mutableBitmap.getWidth() - initX;
         }
-        if (sizeY + initY > fixedBitmap.getHeight()) {
-            sizeY = fixedBitmap.getHeight() - initY;
+        if (sizeY + initY > mutableBitmap.getHeight()) {
+            sizeY = mutableBitmap.getHeight() - initY;
         }
 
-        Bitmap croppedBitmap = Bitmap.createBitmap(fixedBitmap, initX, initY, sizeX, sizeY);
-        if (fixedBitmap != croppedBitmap) {
-            fixedBitmap.recycle();
+        Point init = new Point(initX, initY);
+        Point end = new Point(initX + sizeX, initY + sizeY);
+
+        return new CropResult(mutableBitmap, init, end);
+    }
+
+    @Deprecated
+    public Bitmap cropFace(Context ctx, int resDrawable) {
+        return getCroppedImage(ctx, resDrawable);
+    }
+
+    @Deprecated
+    public Bitmap cropFace(Bitmap bitmap) {
+        return getCroppedImage(bitmap);
+    }
+
+    public Bitmap getFullDebugImage(Context ctx, int resDrawable) {
+        // Set internal configuration to RGB_565
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+
+        return getFullDebugImage(BitmapFactory.decodeResource(ctx.getResources(), resDrawable, bitmapOptions));
+    }
+
+    public Bitmap getFullDebugImage(Bitmap bitmap) {
+        CropResult result = cropFace(bitmap, true);
+        Canvas canvas = new Canvas(result.getBitmap());
+
+        canvas.drawBitmap(result.getBitmap(), new Matrix(), null);
+        canvas.drawRect(result.getInit().x,
+                result.getInit().y,
+                result.getEnd().x,
+                result.getEnd().y,
+                mDebugAreaPainter);
+
+        return result.getBitmap();
+    }
+
+    public Bitmap getCroppedImage(Context ctx, int resDrawable) {
+        // Set internal configuration to RGB_565
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+
+        return getCroppedImage(BitmapFactory.decodeResource(ctx.getResources(), resDrawable, bitmapOptions));
+    }
+
+    public Bitmap getCroppedImage(Bitmap bitmap) {
+        CropResult result = cropFace(bitmap, mDebug);
+        Bitmap croppedBitmap = Bitmap.createBitmap(result.getBitmap(),
+                result.getInit().x,
+                result.getInit().y,
+                result.getEnd().x - result.getInit().x,
+                result.getEnd().y - result.getInit().y);
+
+        if (result.getBitmap() != croppedBitmap) {
+            result.getBitmap().recycle();
         }
 
         return croppedBitmap;
+    }
+
+    protected class CropResult {
+        Bitmap mBitmap;
+        Point mInit;
+        Point mEnd;
+
+        public CropResult(Bitmap bitmap, Point init, Point end) {
+            mBitmap = bitmap;
+            mInit = init;
+            mEnd = end;
+        }
+
+        public CropResult(Bitmap bitmap) {
+            mBitmap = bitmap;
+            mInit = new Point(0, 0);
+            mEnd = new Point(bitmap.getWidth(), bitmap.getHeight());
+        }
+
+        public Bitmap getBitmap() {
+            return mBitmap;
+        }
+
+        public Point getInit() {
+            return mInit;
+        }
+
+        public Point getEnd() {
+            return mEnd;
+        }
     }
 }

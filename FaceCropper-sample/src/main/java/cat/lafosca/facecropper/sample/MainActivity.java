@@ -25,14 +25,40 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         public Bitmap transform(Bitmap source) {
-            return mFaceCropper.cropFace(source);
+            return mFaceCropper.getCroppedImage(source);
         }
 
         @Override
         public String key() {
-            StringBuilder builder = new StringBuilder(48);
+            StringBuilder builder = new StringBuilder();
 
             builder.append("faceCrop(");
+            builder.append("minSize=").append(mFaceCropper.getFaceMinSize());
+            builder.append(",maxFaces=").append(mFaceCropper.getMaxFaces());
+
+            FaceCropper.SizeMode mode = mFaceCropper.getSizeMode();
+            if (FaceCropper.SizeMode.EyeDistanceFactorMargin.equals(mode)) {
+                builder.append(",distFactor=").append(mFaceCropper.getEyeDistanceFactorMargin());
+            } else if (FaceCropper.SizeMode.FaceMarginPx.equals(mode)) {
+                builder.append(",margin=").append(mFaceCropper.getFaceMarginPx());
+            }
+
+            return builder.append(")").toString();
+        }
+    };
+
+    private Transformation mDebugCropTransformation = new Transformation() {
+
+        @Override
+        public Bitmap transform(Bitmap source) {
+            return mFaceCropper.getFullDebugImage(source);
+        }
+
+        @Override
+        public String key() {
+            StringBuilder builder = new StringBuilder();
+
+            builder.append("faceDebugCrop(");
             builder.append("minSize=").append(mFaceCropper.getFaceMinSize());
             builder.append(",maxFaces=").append(mFaceCropper.getMaxFaces());
 
@@ -54,6 +80,7 @@ public class MainActivity extends ActionBarActivity {
 
         mFaceCropper = new FaceCropper(1f);
         mFaceCropper.setFaceMinSize(0);
+//        mFaceCropper.setDebug(true);
         mPicasso = Picasso.with(this);
 
         final ImageAdapter adapter = new ImageAdapter();
@@ -135,7 +162,7 @@ public class MainActivity extends ActionBarActivity {
             ImageView image = (ImageView) v.findViewById(R.id.imageView);
             ImageView imageCropped = (ImageView) v.findViewById(R.id.imageViewCropped);
 
-            mPicasso.load(urls[position]).into(image);
+            mPicasso.load(urls[position]).transform(mDebugCropTransformation).into(image);
 
             mPicasso.load(urls[position])
                     .config(Bitmap.Config.RGB_565)
