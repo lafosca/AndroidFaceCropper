@@ -80,7 +80,7 @@ public class MainActivity extends ActionBarActivity {
 
         mFaceCropper = new FaceCropper(1f);
         mFaceCropper.setFaceMinSize(0);
-//        mFaceCropper.setDebug(true);
+        mFaceCropper.setDebug(true);
         mPicasso = Picasso.with(this);
 
         final ImageAdapter adapter = new ImageAdapter();
