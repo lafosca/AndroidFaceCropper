@@ -25,7 +25,6 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.media.FaceDetector;
 import android.util.Log;
 
@@ -209,7 +208,7 @@ public class FaceCropper {
         Point init = new Point(initX, initY);
         Point end = new Point(initX + sizeX, initY + sizeY);
 
-        return new CropResult(mutableBitmap, init, end);
+        return new CropResult(mutableBitmap, init, end, centerFace);
     }
 
     @Deprecated
@@ -232,16 +231,16 @@ public class FaceCropper {
 
     public Bitmap getFullDebugImage(Bitmap bitmap) {
         CropResult result = cropFace(bitmap, true);
-        Canvas canvas = new Canvas(result.getBitmap());
+        Canvas canvas = new Canvas(result.getOriginalBitmap());
 
-        canvas.drawBitmap(result.getBitmap(), new Matrix(), null);
+        canvas.drawBitmap(result.getOriginalBitmap(), new Matrix(), null);
         canvas.drawRect(result.getInit().x,
                 result.getInit().y,
                 result.getEnd().x,
                 result.getEnd().y,
                 mDebugAreaPainter);
 
-        return result.getBitmap();
+        return result.getOriginalBitmap();
     }
 
     public Bitmap getCroppedImage(Context ctx, int resDrawable) {
@@ -254,38 +253,71 @@ public class FaceCropper {
 
     public Bitmap getCroppedImage(Bitmap bitmap) {
         CropResult result = cropFace(bitmap, mDebug);
-        Bitmap croppedBitmap = Bitmap.createBitmap(result.getBitmap(),
-                result.getInit().x,
-                result.getInit().y,
-                result.getEnd().x - result.getInit().x,
-                result.getEnd().y - result.getInit().y);
 
-        if (result.getBitmap() != croppedBitmap) {
-            result.getBitmap().recycle();
+//        Bitmap croppedBitmap = Bitmap.createBitmap(result.getBitmap(),
+//                result.getInit().x,
+//                result.getInit().y,
+//                result.getEnd().x - result.getInit().x,
+//                result.getEnd().y - result.getInit().y);
+
+        if (result.getOriginalBitmap() != result.getCroppedBitmap()) {
+            result.getOriginalBitmap().recycle();
         }
 
-        return croppedBitmap;
+        return result.getCroppedBitmap();
     }
 
-    protected class CropResult {
-        Bitmap mBitmap;
+    public CropResult getCroppedResult(Bitmap bitmap) {
+        CropResult result = cropFace(bitmap, mDebug);
+        return result;
+    }
+
+    public class CropResult {
         Point mInit;
         Point mEnd;
+        Bitmap mOriginalBitmap;
+        Bitmap mCroppedBitmap;
+        PointF mOriginalCenterFace;
+        PointF mCroppedCenterFace;
 
-        public CropResult(Bitmap bitmap, Point init, Point end) {
-            mBitmap = bitmap;
+        public CropResult(Bitmap originalBitmap, Point init, Point end, PointF originalCenterFace) {
+            mOriginalBitmap = originalBitmap;
             mInit = init;
             mEnd = end;
+            mOriginalCenterFace = originalCenterFace;
+            findCroppedCenterFace();
+            findCroppedBitmap();
         }
 
-        public CropResult(Bitmap bitmap) {
-            mBitmap = bitmap;
+        public CropResult(Bitmap originalBitmap) {
+            mOriginalBitmap = originalBitmap;
             mInit = new Point(0, 0);
-            mEnd = new Point(bitmap.getWidth(), bitmap.getHeight());
+            mEnd = new Point(mOriginalBitmap.getWidth(), mOriginalBitmap.getHeight());
+            mOriginalCenterFace = new PointF(mOriginalBitmap.getWidth() / 2, mOriginalBitmap.getHeight() /2);
+            findCroppedCenterFace();
+            findCroppedBitmap();
         }
 
-        public Bitmap getBitmap() {
-            return mBitmap;
+        private void findCroppedCenterFace() {
+            mCroppedCenterFace = new PointF(mOriginalCenterFace.x - mInit.x,
+                    mOriginalCenterFace.y - mInit.y);
+
+        }
+
+        private void findCroppedBitmap() {
+            mCroppedBitmap = Bitmap.createBitmap(getOriginalBitmap(),
+                    getInit().x,
+                    getInit().y,
+                    getEnd().x - getInit().x,
+                    getEnd().y - getInit().y);
+        }
+
+        public Bitmap getOriginalBitmap() {
+            return mOriginalBitmap;
+        }
+
+        public Bitmap getCroppedBitmap() {
+            return mCroppedBitmap;
         }
 
         public Point getInit() {
@@ -294,6 +326,10 @@ public class FaceCropper {
 
         public Point getEnd() {
             return mEnd;
+        }
+
+        public PointF getmCroppedCenterFace() {
+            return mCroppedCenterFace;
         }
     }
 }
